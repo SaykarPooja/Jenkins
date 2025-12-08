@@ -12,7 +12,7 @@ repository-name
 
 
 
-2.Jenkins Configuration
+2.Jenkins Configuration-
 
 
 Jenkins->Manage Jenkins → System → Global Untrusted Pipeline Libraries
