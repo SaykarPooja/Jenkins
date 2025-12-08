@@ -1,4 +1,4 @@
-1.GitHub Setup
+1.GitHub Setup-
 
 Create a folder named vars (Jenkins automatically looks for shared library scripts here).
 
