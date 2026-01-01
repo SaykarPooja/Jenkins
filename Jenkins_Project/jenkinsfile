@@ -9,7 +9,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/<your-username>/hello-sonar.git'
+                git 'https://github.com/SaykarPooja/Jenkins.git'
             }
         }
 
