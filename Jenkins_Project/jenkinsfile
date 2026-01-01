@@ -5,27 +5,29 @@ pipeline {
         maven 'Maven'
     }
 
-    stage('Build & Test') {
-    steps {
-        sh 'mvn clean package'  // package will compile, test, and create .jar
-    }
-}
+    stages {
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean package'  // package will compile, test, and create .jar
+            }
+        }
 
-stage('Archive Artifact') {
-    steps {
-        archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-    }
-}
+        stage('Archive Artifact') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
 
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
                     sh '''
                     mvn sonar:sonar \
-                    -Dsonar.projectKey=hello-sonar \
-                    -Dsonar.projectName=hello-sonar
+                        -Dsonar.projectKey=hello-sonar \
+                        -Dsonar.projectName=hello-sonar
                     '''
                 }
             }
         }
     }
+}
