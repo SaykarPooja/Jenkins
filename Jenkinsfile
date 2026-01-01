@@ -1,24 +1,40 @@
 pipeline {
     agent any
-    tools { jdk 'Java 17'; maven 'Maven' }
+    tools {
+        jdk 'Java 17'
+        maven 'Maven'
+    }
 
     stages {
         stage('Checkout') {
-            steps { git 'https://github.com/SaykarPooja/Jenkins.git' }
+            steps {
+                git 'https://github.com/<your-username>/Jenkins_Project.git'
+            }
         }
 
-        stage('Build') {
-            steps { sh 'mvn clean package' }
+        stage('Build with Maven') {
+            steps {
+                sh 'mvn clean package'
+            }
         }
 
         stage('SonarQube Analysis') {
-            environment { SONAR_TOKEN = credentials('sonar') }
-            steps { sh "mvn sonar:sonar -Dsonar.projectKey=demo-app -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN" }
+            environment { SONAR_TOKEN = credentials('sonar-token') }
+            steps {
+                sh "mvn sonar:sonar -Dsonar.projectKey=Jenkins_Project -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN"
+            }
         }
 
         stage('Docker Build') {
-            steps { sh 'docker build -t demo-app . || echo "Skipping Docker"' }
+            steps {
+                sh 'docker build -t jenkins-project .'
+            }
+        }
+
+        stage('Docker Run (Test)') {
+            steps {
+                sh 'docker run --rm jenkins-project'
+            }
         }
     }
 }
-
