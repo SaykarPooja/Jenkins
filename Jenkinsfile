@@ -1,53 +1,24 @@
 pipeline {
     agent any
-
-    tools {
-        maven 'Maven-3'
-    }
+    tools { jdk 'Java 17'; maven 'Maven' }
 
     stages {
-
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main', url: 'https://github.com/SaykarPooja/Jenkins.git'
-            }
+        stage('Checkout') {
+            steps { git 'https://github.com/SaykarPooja/Jenkins.git' }
         }
 
-        stage('Build with Maven') {
-            steps {
-                sh 'mvn clean install'
-            }
+        stage('Build') {
+            steps { sh 'mvn clean package' }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
-                        sh "docker build -t ${DOCKER_USER}/simple-java-app:${BUILD_NUMBER} ."
-                    }
-                }
-            }
+        stage('SonarQube Analysis') {
+            environment { SONAR_TOKEN = credentials('sonar') }
+            steps { sh "mvn sonar:sonar -Dsonar.projectKey=demo-app -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN" }
         }
 
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
-                        sh """
-                        echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-                        docker push ${DOCKER_USER}/simple-java-app:${BUILD_NUMBER}
-                        """
-                    }
-                }
-            }
+        stage('Docker Build') {
+            steps { sh 'docker build -t demo-app . || echo "Skipping Docker"' }
         }
     }
 }
+
