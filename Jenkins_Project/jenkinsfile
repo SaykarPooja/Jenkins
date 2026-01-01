@@ -5,13 +5,17 @@ pipeline {
         maven 'Maven'
     }
 
-    stages {
+    stage('Build & Test') {
+    steps {
+        sh 'mvn clean package'  // package will compile, test, and create .jar
+    }
+}
 
-        stage('Build & Test') {
-            steps {
-                sh 'mvn clean test'
-            }
-        }
+stage('Archive Artifact') {
+    steps {
+        archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+    }
+}
 
         stage('SonarQube Analysis') {
             steps {
