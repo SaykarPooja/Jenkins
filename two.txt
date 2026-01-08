@@ -1,1 +1,2 @@
 hii
+hello we are tring git command:s
