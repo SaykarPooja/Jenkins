@@ -1,40 +1,50 @@
 pipeline {
     agent any
+
     tools {
-        jdk 'Java 17'
-        maven 'Maven'
+        maven 'Maven3'   // Name of Maven installation in Jenkins
+        jdk 'Java17'     // Name of JDK installation in Jenkins
+    }
+
+    environment {
+        // SonarQube URL and token stored in Jenkins Credentials (type: Secret Text)
+        SONAR_HOST_URL = 'http://52.66.205.151:9000/'
+        SONAR_AUTH_TOKEN = credentials('sonar-token')  // replace with your Jenkins secret ID
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/SaykarPooja/Jenkins.git'
+                git branch: 'main', url: 'https://github.com/SaykarPooja/Jenkins.git'
             }
         }
 
         stage('Build with Maven') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean install'
             }
         }
 
         stage('SonarQube Analysis') {
-            environment { SONAR_TOKEN = credentials('sonar-token') }
             steps {
-                sh "mvn sonar:sonar -Dsonar.projectKey=Jenkins_Project -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN"
+                sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=MyProject \
+                    -Dsonar.host.url=$SONAR_HOST_URL \
+                    -Dsonar.login=$SONAR_AUTH_TOKEN
+                """
             }
         }
 
-        stage('Docker Build') {
-            steps {
-                sh 'docker build -t jenkins-project .'
-            }
-        }
+    }
 
-        stage('Docker Run (Test)') {
-            steps {
-                sh 'docker run --rm jenkins-project'
-            }
+    post {
+        success {
+            echo 'Build & SonarQube Analysis Completed Successfully!'
+        }
+        failure {
+            echo 'Build or Analysis Failed!'
         }
     }
 }
