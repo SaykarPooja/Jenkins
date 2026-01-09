@@ -7,9 +7,10 @@ pipeline {
     }
 
     environment {
+        // SonarQube token credential ID from Jenkins
         SONAR_TOKEN = credentials('sonar-token')
+        // Replace with your SonarQube server URL if needed
         SONAR_URL = 'http://52.66.205.151:9000'
-        DOCKER_IMAGE = 'btspooja/myapp:latest'  // Replace with your Docker Hub username/image
     }
 
     stages {
@@ -36,26 +37,6 @@ pipeline {
                         -Dsonar.host.url=${SONAR_URL} \
                         -Dsonar.login=${SONAR_TOKEN}
                 """
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                echo 'Building Docker image...'
-                script {
-                    docker.build("${DOCKER_IMAGE}")
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                echo 'Pushing Docker image to Docker Hub...'
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dokcer-hub') {
-                        docker.image("${DOCKER_IMAGE}").push()
-                    }
-                }
             }
         }
 
