@@ -2,18 +2,16 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3'   // Name of Maven installation in Jenkins
-        jdk 'Java17'     // Name of JDK installation in Jenkins
+        jdk 'Java17'
+        maven 'Maven3'
     }
 
     environment {
-        // SonarQube URL and token stored in Jenkins Credentials (type: Secret Text)
         SONAR_HOST_URL = 'http://52.66.205.151:9000'
-        SONAR_AUTH_TOKEN = credentials('sonar-token')  // replace with your Jenkins secret ID
+        SONAR_AUTH_TOKEN = credentials('sonar-token')
     }
 
     stages {
-
         stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/SaykarPooja/Jenkins.git'
@@ -36,7 +34,6 @@ pipeline {
                 """
             }
         }
-
     }
 
     post {
