@@ -2,46 +2,52 @@ pipeline {
     agent any
 
     tools {
-        jdk 'Java'
-        maven 'Maven'
+        jdk 'Java'       // matches your Jenkins JDK name
+        maven 'maven'    // matches your Jenkins Maven name
     }
 
     environment {
-        SONAR_HOST_URL = 'http://52.66.205.151:9000'
-        SONAR_AUTH_TOKEN = credentials('sonar-token')
+        // SonarQube token credential ID from Jenkins
+        SONAR_TOKEN = credentials('sonar-token')
+        // Replace with your SonarQube server URL if needed
+        SONAR_URL = 'http://localhost:9000'
     }
 
     stages {
-        stage('Checkout Code') {
+
+        stage('Checkout') {
             steps {
+                echo 'Cloning GitHub repository...'
                 git branch: 'main', url: 'https://github.com/SaykarPooja/Jenkins.git'
             }
         }
 
-        stage('Build with Maven') {
+        stage('Build') {
             steps {
+                echo 'Building the project with Maven...'
                 sh 'mvn clean install'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
+                echo 'Running SonarQube analysis...'
                 sh """
                     mvn sonar:sonar \
-                    -Dsonar.projectKey=MyProject \
-                    -Dsonar.host.url=$SONAR_HOST_URL \
-                    -Dsonar.login=$SONAR_AUTH_TOKEN
+                        -Dsonar.host.url=${SONAR_URL} \
+                        -Dsonar.login=${SONAR_TOKEN}
                 """
             }
         }
+
     }
 
     post {
         success {
-            echo 'Build & SonarQube Analysis Completed Successfully!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Build or Analysis Failed!'
+            echo 'Pipeline failed!'
         }
     }
 }
