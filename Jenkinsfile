@@ -10,7 +10,7 @@ pipeline {
         // SonarQube token credential ID from Jenkins
         SONAR_TOKEN = credentials('sonar-token')
         // Replace with your SonarQube server URL if needed
-        SONAR_URL = 'http://52.66.205.151/:9000'
+        SONAR_URL = 'http://52.66.205.151:9000'
     }
 
     stages {
